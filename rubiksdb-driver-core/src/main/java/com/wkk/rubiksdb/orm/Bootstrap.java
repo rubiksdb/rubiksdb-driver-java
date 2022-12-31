@@ -1,6 +1,5 @@
 package com.wkk.rubiksdb.orm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wkk.rubiksdb.api.RubiksApi;
 import com.wkk.rubiksdb.api.RubiksKK;
 import com.wkk.rubiksdb.api.RubiksVV;
@@ -11,7 +10,6 @@ import com.wkk.rubiksdb.common.Slice;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +78,8 @@ public class Bootstrap {
                         break;
 
                     default:
-                        throw RubiksException.of(RubiksApi.RUBIKS_INVAL, obj.getClass().getName());
+                        log.error("unsupported index type: {}", obj.getClass().getName());
+                        throw RubiksException.of(RubiksApi.RUBIKS_INVAL, cls.getName());
                 }
             }
             return ser.mark();
@@ -94,23 +93,37 @@ public class Bootstrap {
         return new RubiksKK(table, keyOf(entity, table));
     }
 
-    public static RubiksVV vvOf(Entity entity) throws RubiksException {
-        try {
-            String str = new ObjectMapper().writeValueAsString(entity);
+    public static void indexKKOf(Entity entity,
+                                 List<RubiksKK> result) throws RubiksException {
+        String name = entity.getClass().getName();
+        long table = tableOf(entity);
 
-            return new RubiksVV(
-                    entity.present, entity.seqnum,
-                    Slice.of(str.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception exception) {
-            throw RubiksException.of(RubiksApi.RUBIKS_INVAL, exception);
+        for (long index : INDEX.get(name).keySet()) {
+            if (index != table) {
+                result.add(new RubiksKK(index, keyOf(entity, index)));
+            }
         }
     }
 
-    public static RubiksKK[] kksOf(Entity entity) throws RubiksException {
-        return null;
+    public static RubiksKK indexKKOf(Entity entity, long index) throws RubiksException {
+        String name = entity.getClass().getName();
+        long table = tableOf(entity);
+
+        Invariant.assertY(index != table);
+        Invariant.assertY(INDEX.get(name).containsKey(index));
+
+        return new RubiksKK(index, keyOf(entity, index));
     }
 
-    public static RubiksVV[] vvsOf(Entity entity) throws RubiksException {
-        return null;
+    public static void indexVVOf(Entity entity, List<RubiksVV> result) {
+        String name = entity.getClass().getName();
+        long table = tableOf(entity);
+
+        for (long index : INDEX.get(name).keySet()) {
+            if (index != table) {
+                // take entity present bit, seqnum unchecked as index
+                result.add(new RubiksVV(entity.present, RubiksApi.SEQNUM_INF, Slice.ZERO));
+            }
+        }
     }
 }

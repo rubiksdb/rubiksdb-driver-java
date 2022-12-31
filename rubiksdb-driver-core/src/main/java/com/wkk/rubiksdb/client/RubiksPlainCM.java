@@ -154,12 +154,12 @@ public class RubiksPlainCM implements RubiksCM, RubiksApi, AutoCloseable {
     }
 
     private int victim(long hint, long now) {
-        long max = 0;
+        long max = Long.MIN_VALUE;
         int victim = -1;
 
         for (int i = 0; i < sick.length; ++i) {
             if (now > sick[i] + REVIVE_MS) {
-                if ((this.hint[i] ^ hint) > max) {
+                if ((this.hint[i] ^ hint) >= max) {
                     max = this.hint[i] ^ hint;
                     victim = i;
                 }

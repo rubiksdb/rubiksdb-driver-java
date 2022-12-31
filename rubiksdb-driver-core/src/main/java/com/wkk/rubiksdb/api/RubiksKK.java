@@ -6,6 +6,7 @@ import com.wkk.rubiksdb.common.Perm64;
 import com.wkk.rubiksdb.common.Siphash;
 import lombok.AllArgsConstructor;
 import com.wkk.rubiksdb.common.Slice;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ public class RubiksKK {
 
     @Override
     public String toString() {
-        return format("%d,fixme", table);
+        return format("table=%d,len=%d", table, key.length());
     }
 
     @Override

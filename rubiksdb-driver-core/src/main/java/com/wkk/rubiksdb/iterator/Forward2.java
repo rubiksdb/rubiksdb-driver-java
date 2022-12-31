@@ -23,12 +23,19 @@ public class Forward2 implements Iterator<Pair>, RubiksApi {
         }
         map.clear();
 
-        Pair[] results = rubiks.RPCIterate(kk, MAX_NPAIRS, ITERATE_HINT_ALL, deadline());
-        Invariant.assertY(results.length > 0);  // otherwise exception throws
+        try {
+            Pair[] results = rubiks.RPCIterate(kk, MAX_NPAIRS, ITERATE_HINT_ALL, deadline());
+            Invariant.assertY(results.length > 0);  // otherwise exception throws
 
-        for (int i = 0; i < results.length - 1; ++i) {
-            map.put(results[i].kk, results[i+1]);
+            for (int i = 0; i < results.length - 1; ++i) {
+                map.put(results[i].kk, results[i + 1]);
+            }
+            return results[0];
+        } catch (RubiksException exception) {
+            if (exception.what == RUBIKS_NONEXT) {
+                return null;
+            }
+            throw exception;
         }
-        return results[0];
     }
 }

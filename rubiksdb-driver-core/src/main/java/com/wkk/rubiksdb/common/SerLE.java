@@ -64,10 +64,12 @@ public class SerLE {
     }
 
     public void put(Slice slice) {
-        Invariant.assertY(ii + slice.length() <= i1);
-        System.arraycopy(slice.data, slice.i0,
-                dst, ii, slice.length());
-        ii += slice.length();
+        if (slice.length() > 0) {
+            Invariant.assertY(ii + slice.length() <= i1);
+            System.arraycopy(slice.data, slice.i0,
+                    dst, ii, slice.length());
+            ii += slice.length();
+        }
     }
 
     public Slice mark() {
