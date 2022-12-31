@@ -2,7 +2,6 @@ package com.wkk.rubiksdb.rpcexample;
 
 import com.wkk.rubiksdb.api.RubiksKK;
 import com.wkk.rubiksdb.api.RubiksVV;
-import com.wkk.rubiksdb.client.RubiksCM;
 import com.wkk.rubiksdb.client.RubiksClient;
 import com.wkk.rubiksdb.client.RubiksException;
 import com.wkk.rubiksdb.client.RubiksI;

@@ -14,12 +14,21 @@ public class RubiksException extends Exception {
         this.what = what;
     }
 
+    private RubiksException(int what, Throwable cause) {
+        super(cause);
+        this.what = what;
+    }
+
     public static RubiksException of(int what) {
         return new RubiksException(what, stringify(what));
     }
 
     public static RubiksException of(int what, String msg) {
         return new RubiksException(what, msg);
+    }
+
+    public static RubiksException of(int what, Throwable cause) {
+        return new RubiksException(what, cause);
     }
 
     private static String stringify(int what) {
