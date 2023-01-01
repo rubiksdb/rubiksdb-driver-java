@@ -58,6 +58,16 @@ public class OrmExample {
             log.info("user1: {}", user1);
 
             // list by index
+
+
+            // delete users
+//            user0.present = false;
+//            user1.present = false;
+//            orm.commit(user0, user1);
+//
+//            orm.get(user0, user1);
+//            log.info("user0: {}", user0);
+//            log.info("user1: {}", user1);
         }
     }
 }

@@ -41,7 +41,7 @@ public class Bootstrap {
             if (index != null) {
                 INDEX.get(cname).putIfAbsent(index.id(), new ArrayList<>());
                 INDEX.get(cname).get(index.id()).add(fname);
-                log.info("{} index {}", index.id(), fname);;
+                log.info("{} index {}", index.id(), fname);
             }
         }
     }
@@ -50,9 +50,8 @@ public class Bootstrap {
         return entity.getClass().getAnnotation(Table.class).id();
     }
 
-    public static Slice keyOf(Entity entity, long index) throws RubiksException {
+    public static void serialize(Entity entity, long index, SerBE ser) throws RubiksException {
         Class<? extends Entity> cls = entity.getClass();
-        SerBE ser = SerBE.of(new byte[RubiksApi.MAX_PAIR_SIZE]);
 
         try {
             for (String name : INDEX.get(cls.getName()).get(index)) {
@@ -82,37 +81,48 @@ public class Bootstrap {
                         throw RubiksException.of(RubiksApi.RUBIKS_INVAL, cls.getName());
                 }
             }
-            return ser.mark();
         } catch (Exception exception) {
             throw RubiksException.of(RubiksApi.RUBIKS_INVAL, exception);
         }
     }
 
-    public static RubiksKK primaryKKOf(Entity entity) throws RubiksException {
+    public static RubiksKK primaryKKOf(Entity entity, SerBE ser) throws RubiksException {
         long table = tableOf(entity);
-        return new RubiksKK(table, keyOf(entity, table));
+        serialize(entity, table, ser);
+
+        return new RubiksKK(table, ser.flip());
     }
 
-    public static void indexKKOf(Entity entity,
-                                 List<RubiksKK> result) throws RubiksException {
+    public static void indexKKOf(Entity entity, RubiksKK pk,
+                                 List<RubiksKK> result, SerBE ser) throws RubiksException {
+        Invariant.assertY(pk.key.length() > 0);
+
         String name = entity.getClass().getName();
         long table = tableOf(entity);
 
         for (long index : INDEX.get(name).keySet()) {
             if (index != table) {
-                result.add(new RubiksKK(index, keyOf(entity, index)));
+                serialize(entity, index, ser);
+
+                // append pk to the index key
+                ser.put (pk.key);
+                ser.put3(pk.key.length());
+
+                result.add(new RubiksKK(index, ser.flip()));
             }
         }
     }
 
-    public static RubiksKK indexKKOf(Entity entity, long index) throws RubiksException {
+    public static RubiksKK indexKKOf(Entity entity,
+                                     long index, SerBE ser) throws RubiksException {
         String name = entity.getClass().getName();
         long table = tableOf(entity);
 
         Invariant.assertY(index != table);
         Invariant.assertY(INDEX.get(name).containsKey(index));
 
-        return new RubiksKK(index, keyOf(entity, index));
+        serialize(entity, index, ser);
+        return new RubiksKK(index, ser.flip());
     }
 
     public static void indexVVOf(Entity entity, List<RubiksVV> result) {

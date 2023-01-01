@@ -1,7 +1,8 @@
 package com.wkk.rubiksdb.orm;
 
+import com.wkk.rubiksdb.api.RubiksApi;
 import com.wkk.rubiksdb.client.RubiksException;
-import com.wkk.rubiksdb.common.Slice;
+import com.wkk.rubiksdb.common.SerBE;
 import lombok.Builder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ public class OrmTest {
 
     @Test
     public void test0() throws RubiksException {
+        SerBE ser = SerBE.of(RubiksApi.MAX_PAYLOAD_SIZE);
         User user0 =
                 User.builder()
                         .id(1234)
@@ -27,14 +29,14 @@ public class OrmTest {
                         .build();
         Assertions.assertEquals(USER_TABLE, Bootstrap.tableOf(user0));
 
-        Slice slice = Bootstrap.keyOf(user0, USER_TABLE);
-        Assertions.assertEquals(8, slice.length());
+        Bootstrap.serialize(user0, USER_TABLE, ser);
+        Assertions.assertEquals(8, ser.flip().length());
 
-        slice = Bootstrap.keyOf(user0, NAME_INDEX);
-        Assertions.assertEquals(6, slice.length());
+        Bootstrap.serialize(user0, NAME_INDEX, ser);
+        Assertions.assertEquals(6, ser.flip().length());
 
-        slice = Bootstrap.keyOf(user0, ADDR_INDEX);
-        Assertions.assertEquals(30, slice.length());
+        Bootstrap.serialize(user0, ADDR_INDEX, ser);
+        Assertions.assertEquals(30, ser.flip().length());
     }
 
     @Table(id = USER_TABLE)

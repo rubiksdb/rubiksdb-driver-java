@@ -14,9 +14,10 @@ public interface RubiksApi {
     long WIRE_MAGIC = 0x143e;
     long PORT_DELTA = 8;
 
-    int MAX_NPAIRS     = 8;
-    int MAX_PAIR_SIZE  = 15 * 1024;
-    int SERIALIZE_SIZE = 1024 /*stuff*/ + MAX_NPAIRS * MAX_PAIR_SIZE;
+    int MAX_NPAIRS       = 8;
+    int MAX_PAIR_SIZE    = 15 * 1024;
+    int MAX_PAYLOAD_SIZE = 30 * 1024;
+    int SERIALIZE_SIZE   = 1024 /*stuff*/ + MAX_PAYLOAD_SIZE;
 
     long ITERATE_HINT_BACK   = 0x01;
     long ITERATE_HINT_VALUE  = 0x02;
