@@ -45,6 +45,10 @@ public class RubiksClient implements RubiksI {
         RubiksR rbr = new RubiksR();
         rbr.initCOMMIT(kks, vvs, deadline);
 
+        if (rbr.req.payload.length() > RubiksApi.MAX_COMMIT_SIZE) {
+            throw RubiksException.of(RubiksApi.RUBIKS_INVAL, "commit size overflows!");
+        }
+
         RubiksKK[] result = retry.process0(() ->
             cm.RPCWithKKs(rbr, cm.coarseHint(kks[0])), deadline);
 

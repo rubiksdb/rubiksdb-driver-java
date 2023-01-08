@@ -17,6 +17,9 @@ public interface RubiksApi {
     int MAX_NPAIRS       = 8;
     int MAX_PAIR_SIZE    = 15 * 1024;
     int MAX_PAYLOAD_SIZE = 30 * 1024;
+
+    // we don't want single page be split twice in on txn
+    int MAX_COMMIT_SIZE  = MAX_PAIR_SIZE;
     int SERIALIZE_SIZE   = 1024 /*stuff*/ + MAX_PAYLOAD_SIZE;
 
     long ITERATE_HINT_BACK   = 0x01;
